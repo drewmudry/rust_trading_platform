@@ -4,21 +4,22 @@ use matching_engine::orderbook::{BidOrAsk, Order, Orderbook};
 use rust_decimal_macros::dec;
 
 fn main() {
-    let buy_order_1 = Order::new(BidOrAsk::Bid, 5.5);
-    let buy_order_2 = Order::new(BidOrAsk::Bid, 2.45);
-    
-    let mut orderbook = Orderbook::new();
-    orderbook.add_limit_order(dec!(4.4), buy_order_1);
-    orderbook.add_limit_order(dec!(4.4), buy_order_2);
+    // create new orderbook and add limit orders to it
+    let mut Orderbook = Orderbook::new();
+    Orderbook.add_limit_order(dec!(640), Order::new(BidOrAsk::Ask, 10.0));
+    //Orderbook.add_limit_order(dec!(90), Order::new(BidOrAsk::Ask, 10.0));
+    //Orderbook.add_limit_order(dec!(200), Order::new(BidOrAsk::Ask, 10.0));
+    //Orderbook.add_limit_order(dec!(340), Order::new(BidOrAsk::Ask, 10.0));
 
-    let sell_order = Order::new(BidOrAsk::Ask, 6.5);
-    orderbook.add_limit_order(dec!(20.0), sell_order);
+    // add market order to orderbook
+    let mut market_order = Order::new(BidOrAsk::Bid, 10.0);
 
+    //fill the market order with the existing limit orders
+    Orderbook.fill_market_order(&mut market_order);
 
-    let mut engine = MatchingEngine::new();
-    let pair = TradingPair::new("BTC".to_string(), "USD".to_string());
-    engine.add_new_market(pair.clone());
+    let ask_limit = Orderbook.ask_limits();
+    let matched_limit = ask_limit.get(0).unwrap();
 
-    let buy_order = Order::new(BidOrAsk::Bid, 6.5);
-    engine.place_limit_order(pair, dec!(10000.0), buy_order).unwrap();
+    println!("{:?}", Orderbook.ask_limits());
+
 }
